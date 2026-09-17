@@ -458,9 +458,19 @@ export interface ToolRuntimeScheduler {
 
 /**
  * Scheduler entry point omitted from the generated named service API.
+ *
+ * Interned via `Symbol.for`: a plain `Symbol()` mints a new identity on every
+ * module evaluation, so a partial HMR reload that re-imports this module
+ * without also reloading `dsh-agent-loop` (a separate plugin entry that reads
+ * this constant once at import time) leaves the two sides holding
+ * non-identical symbols — `ctx.tools[TOOL_RUNTIME_SCHEDULER]` then reads
+ * `undefined` even though `ctx.tools` itself is a live `ToolRuntime`. The
+ * global symbol registry keeps the key stable across reloads. (No explicit
+ * type annotation: TypeScript infers `unique symbol` from a bare
+ * `Symbol.for()` initializer, but rejects it as an annotation or assertion.)
  * @internal
  */
-export const TOOL_RUNTIME_SCHEDULER: unique symbol = Symbol('@deepseek-ai/dsh-tools.scheduler')
+export const TOOL_RUNTIME_SCHEDULER = Symbol.for('@deepseek-ai/dsh-tools.scheduler')
 
 /** Canonical error code for cancellation after a tool body was invoked. */
 export const TOOL_ABORTED = 'ABORTED'
