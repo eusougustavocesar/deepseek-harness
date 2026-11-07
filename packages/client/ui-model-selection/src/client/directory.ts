@@ -55,6 +55,7 @@ export class ModelDirectory {
    * @param available - whether this session may use Agent-bound model RPCs.
    * @param catalog - Host-generation catalog shared by every Session.
    * @param projected - durable model selection projected from Session history.
+   * @param commands - the commands remote for executing /plan automatically.
    */
   constructor(
     private readonly sessions: Pick<TypertClientRemote['session'], 'selectModel'>,
@@ -62,6 +63,7 @@ export class ModelDirectory {
     private readonly available: () => boolean,
     private readonly catalog: ModelCatalogDirectory,
     private readonly projected: ObservableSnapshot<unknown>,
+    private readonly commands?: Pick<TypertClientRemote['commands'], 'execute'>,
   ) {
     this.unsubscribeCatalog = catalog.store.subscribe(() => { this.syncInputs() })
     this.unsubscribeSelection = projected.subscribe(() => { this.syncInputs() })
@@ -110,6 +112,20 @@ export class ModelDirectory {
     }
     this.store.update((s) => { s.status = 'ready'; s.error = null })
     this.syncInputs()
+
+    // Auto-enable plan mode for "opusplan" model (Claude Code compatibility)
+    if ((selection.model === 'opusplan' || selection.model.toLowerCase().includes('plan-mode')) && this.commands) {
+      try {
+        console.info('[ui-model-selection] Auto-activating plan mode for model:', selection.model)
+        const planResult = await this.commands.execute(this.sessionId, '/plan', [])
+        if (!planResult.ok || planResult.value === undefined) {
+          console.warn('[ui-model-selection] Failed to auto-activate plan mode:', planResult)
+        }
+      } catch (error) {
+        console.warn('[ui-model-selection] Error auto-activating plan mode:', error)
+      }
+    }
+
     return { ok: true, value: undefined }
   }
 
