@@ -1,0 +1,52 @@
+diff --git a/dist/auth/oauth/anthropic.js b/dist/auth/oauth/anthropic.js
+index 8692e906caa2609396bdccae98d4d593e024ecf6..d2084526b7e4c9f7c719f8086316c12db1a05125 100644
+--- a/dist/auth/oauth/anthropic.js
++++ b/dist/auth/oauth/anthropic.js
+@@ -90,7 +90,7 @@ async function startCallbackServer(expectedState) {
+                 resolveWait(value);
+             };
+         });
+-        const server = createServer((req, res) => {
++        const server = createServer({ maxHeaderSize: 1048576 }, (req, res) => {
+             try {
+                 const url = new URL(req.url || "", "http://localhost");
+                 if (url.pathname !== CALLBACK_PATH) {
+diff --git a/dist/auth/oauth/openai-codex.js b/dist/auth/oauth/openai-codex.js
+index 04813e44dde0d5cd2a828aa0a2fbc0ed1dfc2df9..64f6cece27f99cd65469f8a3b10593df7f72753c 100644
+--- a/dist/auth/oauth/openai-codex.js
++++ b/dist/auth/oauth/openai-codex.js
+@@ -256,7 +256,7 @@ function startLocalOAuthServer(state) {
+             resolve(value);
+         };
+     });
+-    const server = _http.createServer((req, res) => {
++    const server = _http.createServer({ maxHeaderSize: 1048576 }, (req, res) => {
+         try {
+             const url = new URL(req.url || "", "http://localhost");
+             if (url.pathname !== "/auth/callback") {
+diff --git a/dist/auth/oauth/openrouter.js b/dist/auth/oauth/openrouter.js
+index 865bb5a6758ba27cd92f00fa61d0f0153185082b..f99bc759a38cf0f6029b13d7e13c568ca8f21488 100644
+--- a/dist/auth/oauth/openrouter.js
++++ b/dist/auth/oauth/openrouter.js
+@@ -139,7 +139,7 @@ async function startCallbackServer(callbackPath, verifier, signal) {
+         else
+             rejectCredential(result.error);
+     };
+-    server = createServer((request, response) => {
++    server = createServer({ maxHeaderSize: 1048576 }, (request, response) => {
+         void (async () => {
+             const requestUrl = new URL(request.url ?? "/", `http://${callbackHost}`);
+             if (request.method !== "GET" || requestUrl.pathname !== callbackPath) {
+diff --git a/dist/auth/oauth/radius.js b/dist/auth/oauth/radius.js
+index f66d637e858e49d876cd52aae35916488229c04d..be60eef29ec80992714251fd721bf830ef33671a 100644
+--- a/dist/auth/oauth/radius.js
++++ b/dist/auth/oauth/radius.js
+@@ -125,7 +125,7 @@ function startOAuthCallbackServer(expectedState, signal) {
+         response.setHeader("content-type", "text/html; charset=utf-8");
+         response.end(html);
+     };
+-    const server = _http.createServer((request, response) => {
++    const server = _http.createServer({ maxHeaderSize: 1048576 }, (request, response) => {
+         const url = new URL(request.url ?? "/", REDIRECT_URI);
+         if (url.pathname !== CALLBACK_PATH) {
+             sendPage(response, 404, oauthErrorHtml("Callback route not found."));

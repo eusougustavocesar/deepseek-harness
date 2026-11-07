@@ -10,6 +10,7 @@ overrides:
   '@deepseek-ai/schemastery': link:vendor/schemastery
 
 patchedDependencies:
+  '@earendil-works/pi-ai@0.85.1': c28b95315bfb1ee90112a38f317d1b60a62577843a61b8027a557aa944e18285
   '@electron/osx-sign@1.3.3': 280e7b2816caf01423097d24e79107a66afeb563a348630ce9928ae8499a5861
   '@yao-pkg/pkg@6.21.0': 07f08c630d0d3886d81fd4600116d07e4871ddcd57f92cb22746b6d246cdc337
   node-pty@1.2.0-beta.15: b40ae545608897914bd25fb009c97eeac478c34e8a910298ddcb01b746534bb0
@@ -8266,7 +8267,7 @@ importers:
         version: link:../../../vendor/schemastery
       '@earendil-works/pi-ai':
         specifier: ^0.85.1
-        version: 0.85.1(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(ws@8.21.0)(zod@4.4.3)
+        version: 0.85.1(patch_hash=c28b95315bfb1ee90112a38f317d1b60a62577843a61b8027a557aa944e18285)(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(ws@8.21.0)(zod@4.4.3)
     devDependencies:
       '@deepseek-ai/cordis':
         specifier: workspace:^
@@ -14471,10 +14472,12 @@ packages:
 
   '@modelcontextprotocol/server-everything@2026.7.4':
     resolution: {integrity: sha512-ydMW/M6rk9tK23b+U38trsNLHhd5eF+ntiv2Vr+RPMDhbiKY/IKrZU25ukvSXVPUBvy7TxTPWpeV4KcYcXg72w==}
+    deprecated: 'Date-based versions are no longer published. This package has resumed semantic versioning at 1.0.0: install the latest version.'
     hasBin: true
 
   '@modelcontextprotocol/server-filesystem@2026.7.10':
     resolution: {integrity: sha512-Mmjg4anFBD5OzbPnGJOA0jPPN8645ERhQk38HQLpSenx1ox9bfdPkmAzUnNjeQtqQGFLtKe13J20RtLBmUKMZA==}
+    deprecated: 'Date-based versions are no longer published. This package has resumed semantic versioning at 1.0.0: install the latest version.'
     hasBin: true
 
   '@modelcontextprotocol/server@2.0.0':
@@ -15449,6 +15452,9 @@ packages:
   '@smithy/core@3.24.7':
     resolution: {integrity: sha512-KoUi4M1f3BG6kzN1FnCwL7oyFptTbyBJKjR6yhSib+JHRdUmM1o+VwsFtJ66NZCkCzVfJMWRHJNo0R0jznp0Pg==}
     engines: {node: '>=18.0.0'}
+    deprecated: |-
+      Deprecated due to a bug in custom logger data redaction. Upgrade to the latest version. If you used a custom logger with this
+        version, review your logs and rotate any credentials or other secrets. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/credential-provider-imds@4.3.9':
     resolution: {integrity: sha512-ZlfJ/4Fa3jYb+3eaohPfG9utX9HmdhFNcFtpoGAhUhdynAOmGXtmigbi7eEiONKM+ykHw8RwKuDEb85Lx7t7fA==}
@@ -20703,7 +20709,7 @@ snapshots:
     transitivePeerDependencies:
       - '@algolia/client-search'
 
-  '@earendil-works/pi-ai@0.85.1(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(ws@8.21.0)(zod@4.4.3)':
+  '@earendil-works/pi-ai@0.85.1(patch_hash=c28b95315bfb1ee90112a38f317d1b60a62577843a61b8027a557aa944e18285)(@modelcontextprotocol/sdk@1.29.0(zod@4.4.3))(ws@8.21.0)(zod@4.4.3)':
     dependencies:
       '@anthropic-ai/sdk': 0.123.0(zod@4.4.3)
       '@aws-sdk/client-bedrock-runtime': 3.1048.0
