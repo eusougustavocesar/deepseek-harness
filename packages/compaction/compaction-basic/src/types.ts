@@ -28,6 +28,8 @@ export interface CompactionPolicyConfig {
   summarizationModel?: string
   /** Provider generation cap for summarization. Defaults to the resolved `headroomTokens`; an explicit cap must be positive. */
   maxTokens?: number
+  /** Summary generation cap for a model whose adapter declares no output limit. Positive integer; defaults to `32000`. */
+  unknownOutputLimitMaxTokens?: number
   /** Extra attempts after the first compaction when pressure remains above threshold. Defaults to `1`. */
   compactionRetries?: number
   /** Maximum retries after canonical context overflow; `0` disables recovery. Defaults to `1`. */
@@ -62,6 +64,7 @@ interface ResolvedPolicyFields {
   readonly summarizationProvider: string
   readonly summarizationModel: string
   readonly maxTokens: number
+  readonly unknownOutputLimitMaxTokens: number
   readonly compactionRetries: number
   readonly maxOverflowRetries: number
 }

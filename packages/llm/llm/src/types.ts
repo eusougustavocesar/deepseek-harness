@@ -456,6 +456,12 @@ export interface LlmResolvedModelInfo extends LlmModelInfo {
   context?: LlmModelContext
   /** Adapter-configured per-request output cap materialized when callers omit one. */
   defaultMaxTokens?: number
+  /**
+   * Provider-owned limit on output tokens for this model, when the adapter knows it.
+   * The runtime reports it without clamping; callers that choose their own
+   * `maxTokens` (such as compaction summaries) cap the request with it.
+   */
+  maxOutputTokens?: number
   /** Adapter-owned selectable reasoning levels when exposed. */
   reasoning?: LlmModelReasoningInfo
   /** Declared mid-conversation system prompt handling; absent means only a leading system message is read. */

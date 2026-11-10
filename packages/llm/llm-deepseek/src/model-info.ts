@@ -77,6 +77,8 @@ export function modelInfo(
       : catalogModelInfo(provider, configured),
     context: { contextWindow },
     defaultMaxTokens: configured?.maxTokens ?? connection.maxTokens,
+    // A catalogued model's maxTokens is its output limit (listing facts or catalog override).
+    ...configured?.maxTokens === undefined ? {} : { maxOutputTokens: configured.maxTokens },
     ...configured?.systemPromptUpdate === undefined ? {} : { systemPromptUpdate: configured.systemPromptUpdate },
     ...configured?.toolUpdate === undefined ? {} : { toolUpdate: configured.toolUpdate },
     ...connection.defaults.thinking === 'disabled'

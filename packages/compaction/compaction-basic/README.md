@@ -71,7 +71,8 @@ All settings are optional. With context window `W`, effective request output cap
 | `retainTokens` | — | Absolute recent-conversation budget kept verbatim; mutually exclusive with `retainRatio` and must be below the resolved threshold. |
 | `summarizationProvider` | `''` | Set together with `summarizationModel`; an empty pair uses the latest routed request target, then the `AgentOptions` pair. |
 | `summarizationModel` | `''` | Set together with `summarizationProvider`; an empty pair uses the latest routed request target, then the `AgentOptions` pair. |
-| `maxTokens` | `headroomTokens` (`65536`) | Positive summary output cap, including any provider-counted reasoning tokens. Explicit per-model caps override explicit global caps; otherwise the cap follows the resolved headroom. |
+| `maxTokens` | `headroomTokens` (`65536`) | Positive summary output cap, including any provider-counted reasoning tokens. Explicit per-model caps override explicit global caps; otherwise the cap follows the resolved headroom. The request sends the smaller of this cap and the summarization model's `maxOutputTokens` when its adapter declares one, and `compaction/summary` records the value sent; a route without a declared limit sends the smaller of this cap and `unknownOutputLimitMaxTokens` and logs a warning. |
+| `unknownOutputLimitMaxTokens` | `32000` | Positive summary output cap used when the summarization model's adapter declares no `maxOutputTokens`. |
 | `compactionRetries` | `1` | Extra condensation attempts after the first when pressure remains above threshold. |
 | `maxOverflowRetries` | `1` | Maximum retries after a confirmed context-window overflow; `0` disables recovery only. |
 | `modelPolicies` | `[]` | Exact `{ provider, model, ...partialPolicy }` overrides for individual model routes. |

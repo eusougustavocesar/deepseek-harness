@@ -378,6 +378,10 @@ export class PiAiAdapter extends LlmAdapter {
       inputModalities: [...resolvedModel.input],
       context: { contextWindow: resolvedModel.contextWindow },
       ...configuredMaxTokens === undefined ? {} : { defaultMaxTokens: configuredMaxTokens },
+      // The catalog's `maxTokens` is the provider's output limit for this model.
+      ...Number.isSafeInteger(resolvedModel.maxTokens) && resolvedModel.maxTokens > 0
+        ? { maxOutputTokens: resolvedModel.maxTokens }
+        : {},
       ...reasoningInfo(resolvedModel, defaultLevel),
       ...conversationUpdates(resolvedModel),
     }

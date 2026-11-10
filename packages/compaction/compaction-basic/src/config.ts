@@ -22,6 +22,9 @@ const DEFAULT_THRESHOLD_RATIO = 0.8
 /** Default verbatim-tail fraction for every routed model. */
 const DEFAULT_RETAIN_RATIO = 0.16
 
+/** Default summary cap for a model whose adapter declares no output limit. */
+const DEFAULT_UNKNOWN_OUTPUT_LIMIT_MAX_TOKENS = 32_000
+
 /** Fields shared by top-level defaults and exact-target overrides. */
 const POLICY_CONFIG_KEYS = [
   'thresholdRatio',
@@ -31,6 +34,7 @@ const POLICY_CONFIG_KEYS = [
   'summarizationProvider',
   'summarizationModel',
   'maxTokens',
+  'unknownOutputLimitMaxTokens',
   'compactionRetries',
   'maxOverflowRetries',
 ] as const
@@ -102,6 +106,7 @@ export function resolveConfig(config: BasicCompactionConfig = {}): ResolvedConfi
     summarizationProvider: config.summarizationProvider ?? '',
     summarizationModel: config.summarizationModel ?? '',
     maxTokens,
+    unknownOutputLimitMaxTokens: config.unknownOutputLimitMaxTokens ?? DEFAULT_UNKNOWN_OUTPUT_LIMIT_MAX_TOKENS,
     compactionRetries: config.compactionRetries ?? 1,
     maxOverflowRetries: config.maxOverflowRetries ?? 1,
     modelPolicies,
@@ -133,6 +138,7 @@ export function resolveTargetPolicy(
     summarizationProvider: override?.summarizationProvider ?? config.summarizationProvider,
     summarizationModel: override?.summarizationModel ?? config.summarizationModel,
     maxTokens: override?.maxTokens ?? config.maxTokens,
+    unknownOutputLimitMaxTokens: override?.unknownOutputLimitMaxTokens ?? config.unknownOutputLimitMaxTokens,
     compactionRetries: override?.compactionRetries ?? config.compactionRetries,
     maxOverflowRetries: override?.maxOverflowRetries ?? config.maxOverflowRetries,
   })
@@ -211,6 +217,7 @@ export function resolveCompactSpec(
     summarizationProvider: policy.summarizationProvider,
     summarizationModel: policy.summarizationModel,
     maxTokens: policy.maxTokens,
+    unknownOutputLimitMaxTokens: policy.unknownOutputLimitMaxTokens,
     compactionRetries: policy.compactionRetries,
     maxOverflowRetries: policy.maxOverflowRetries,
   })
@@ -293,6 +300,10 @@ function validatePolicy(
     throw new Error(`${name}: retainRatio and retainTokens are mutually exclusive`)
   }
   if (maxTokens !== undefined) assertPositiveInteger(`${name}.maxTokens`, maxTokens)
+  const unknownOutputLimitMaxTokens = config.unknownOutputLimitMaxTokens
+  if (unknownOutputLimitMaxTokens !== undefined) {
+    assertPositiveInteger(`${name}.unknownOutputLimitMaxTokens`, unknownOutputLimitMaxTokens)
+  }
   if (compactionRetries !== undefined) {
     assertNonNegativeInteger(`${name}.compactionRetries`, compactionRetries)
   }

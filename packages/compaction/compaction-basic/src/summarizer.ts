@@ -16,6 +16,7 @@ interface SummaryConfig {
   readonly summarizationProvider: string
   readonly summarizationModel: string
   readonly maxTokens: number
+  readonly unknownOutputLimitMaxTokens: number
 }
 
 /** Tags wrapping the structured summary inside the landed checkpoint node. */
@@ -141,6 +142,7 @@ export async function summarizeWithLlm(
     )
   }
 
+  const maxTokens = await summaryMaxTokens(ctx, config, target, signal)
   const assembler = new BlockAssembler()
   const messages: RequestMessage[] = [
     ...input.messages,
@@ -155,7 +157,7 @@ export async function summarizeWithLlm(
     messages,
     toolHistory: agent.session.toolHistory(),
     ...input.tools === undefined ? {} : { tools: [...input.tools] },
-    maxTokens: config.maxTokens,
+    maxTokens,
     sessionId: agent.session.id,
     purpose: 'compaction',
     ...signal === undefined ? {} : { signal },
@@ -175,9 +177,39 @@ export async function summarizeWithLlm(
     llmStreamCall: true,
     provider: options.provider,
     model: options.model,
-    maxTokens: config.maxTokens,
+    maxTokens,
     ...(assembler.usage === undefined ? {} : { usage: assembler.usage }),
   }
+}
+
+/**
+ * Cap the configured summary output at the destination model's output limit.
+ * The capped value is what the request sends and what the checkpoint records.
+ * A route whose adapter declares no limit is capped at
+ * `unknownOutputLimitMaxTokens` instead and logs a warning naming the route.
+ * @param ctx - context carrying the `llm` service and logger.
+ * @param config - the policy's summary output cap and unknown-limit cap.
+ * @param target - the exact summarization route.
+ * @param signal - optional cancellation for the adapter capability lookup.
+ * @returns the output cap to send.
+ */
+export async function summaryMaxTokens(
+  ctx: Context,
+  config: Pick<SummaryConfig, 'maxTokens' | 'unknownOutputLimitMaxTokens'>,
+  target: { readonly provider: string; readonly model: string },
+  signal?: AbortSignal,
+): Promise<number> {
+  const { maxOutputTokens } = await ctx.llm.resolveModelInfo(target.provider, target.model, signal)
+  if (maxOutputTokens === undefined) {
+    const capped = Math.min(config.maxTokens, config.unknownOutputLimitMaxTokens)
+    ctx.logger.warn(
+      `compaction-basic: ${target.provider}/${target.model} declares no output limit; `
+      + `the summary requests maxTokens ${capped} (unknownOutputLimitMaxTokens). Set maxTokens for `
+      + 'that model in its adapter catalog to use its real limit',
+    )
+    return capped
+  }
+  return Math.min(config.maxTokens, maxOutputTokens)
 }
 
 /**

@@ -433,6 +433,9 @@ describe('validated configuration', () => {
   it('advertises exact model metadata and allows unlisted text models', () => {
     expect(modelInfo(connection, 'deepseek-official', MODEL)).toMatchObject({ context: { contextWindow: 1_000_000 }, defaultMaxTokens: 256_000, reasoning: { efforts: [{ id: 'off' }, { id: 'low' }, { id: 'high' }, { id: 'max' }], defaultEffort: 'high' } })
     expect(modelInfo(connection, 'deepseek-official', 'custom').inputModalities).toEqual(['text'])
+    expect(modelInfo(connection, 'deepseek-official', MODEL).maxOutputTokens)
+      .toBe(connection.models.find(model => model.id === MODEL)?.maxTokens)
+    expect(modelInfo(connection, 'deepseek-official', 'custom').maxOutputTokens).toBeUndefined()
     expect(modelInfo(connection, 'deepseek-official', MODEL).systemPromptUpdate).toBeUndefined()
     expect(modelInfo(connection, 'deepseek-official', 'custom').systemPromptUpdate).toBeUndefined()
     expect(modelInfo(capable, 'deepseek-official', MODEL).systemPromptUpdate).toBe('in-history')

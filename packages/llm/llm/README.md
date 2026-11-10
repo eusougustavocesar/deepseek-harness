@@ -135,6 +135,7 @@ File detection reads current content, including tool-role result content, on eve
 - **Model-visible ⟺ logged** — callers must keep every provider request's model-visible input reconstructable from the session log; loop-built requests arrive deep-frozen and cannot be rewritten.
 - **Replay state travels only within one adapter** — assistant replay state rides along only when the same adapter instance owns the historical and target routes; otherwise it is dropped before dispatch.
 - **Prepared calls are one-shot** — a prepared call can be dispatched exactly once, and its call-config fields must match the prepared config.
+- **Output limits are reported, not enforced** — `resolveModelInfo` carries an adapter-declared `maxOutputTokens` (positive safe integer, validated like `defaultMaxTokens`); the runtime never clamps `maxTokens`, so a caller that sizes its own request (compaction summaries) caps it with that value.
 - **Image projection follows the captured route** — durable `ImageBlock` references become route-specific request versions only for image-capable models; text-only models receive stable placeholders.
 - **File projection is unconditional** — no provider receives file bytes; every route gets one deterministic handle line per `FileBlock`, and the model reads the saved copy with its file tools on demand.
 - **Protocol ordering** — `usage` precedes `finish`, tool arguments stay raw JSON strings, and nothing follows the terminal `finish`.

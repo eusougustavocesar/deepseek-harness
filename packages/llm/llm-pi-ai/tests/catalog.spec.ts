@@ -516,6 +516,22 @@ describe('catalog routes with per-model configuration', () => {
     expect((await ctx.llm.listModels('deepseek')).map(model => model.id)).toEqual([catalogModel.id])
   })
 
+  it('reports the catalog output limit as maxOutputTokens without making it a request default', async () => {
+    const server = await mockServer([])
+    const [catalogModel] = getBuiltinModels('deepseek')
+    if (catalogModel === undefined) throw new Error('the installed catalog ships no deepseek model')
+    const ctx = await harness({ providers: { deepseek: { baseURL: server.url } } })
+
+    const info = await ctx.llm.resolveModelInfo('deepseek', catalogModel.id)
+    expect(info.maxOutputTokens).toBe(catalogModel.maxTokens)
+    expect(info.defaultMaxTokens).toBeUndefined()
+  })
+
+  it('ships a 64,000-token output limit for claude-opus-4-5 in the installed anthropic catalog', () => {
+    const opus = getBuiltinModels('anthropic').find(model => model.id === 'claude-opus-4-5')
+    expect(opus?.maxTokens).toBe(64_000)
+  })
+
   it('materializes a request default only from a configured output cap', async () => {
     const server = await mockServer([])
     const [catalogModel] = getBuiltinModels('deepseek')
